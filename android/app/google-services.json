@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1071021739332",
+    "firebase_url": "https://foodmaps-official-database-default-rtdb.firebaseio.com",
+    "project_id": "foodmaps-official-database",
+    "storage_bucket": "foodmaps-official-database.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071021739332:android:e11ac19b241b5344fa5b11",
+        "android_client_info": {
+          "package_name": "com.example.foodmaps_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1071021739332-hr08ha7eap9gp9udq9ijp3e9n3lnsv45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHvAxw9DQxyH84RWfWbAIbi2ostiuqKG8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1071021739332-hr08ha7eap9gp9udq9ijp3e9n3lnsv45.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

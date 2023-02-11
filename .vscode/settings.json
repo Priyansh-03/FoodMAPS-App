@@ -1,0 +1,7 @@
+{
+    "cmake.configureOnOpen": false,
+    "git.decorations.enabled": false,
+    "git.enabled": true,
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cmake.sourceDirectory": "${workspaceFolder}/windows/flutter"
+}
