@@ -13,13 +13,20 @@ class SecondPart extends StatelessWidget {
   final double productOldPrice;
   final int productRate;
   final String productDescription;
+  final String productId;
+  final String productImage;
+  final String productCategory;
+
   const SecondPart({
     Key? key,
     required this.productName,
+    required this.productImage,
     required this.productPrice,
     required this.productOldPrice,
     required this.productRate,
     required this.productDescription,
+    required this.productId,
+    required this.productCategory,
   }) : super(key: key);
 
   @override
@@ -105,6 +112,24 @@ class SecondPart extends StatelessWidget {
               ),
               MyButton(
                 onPressed: () {
+                  FirebaseFirestore.instance
+                      .collection("Cart")
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .collection("UserCart")
+                      .doc(productId)
+                      .set(
+                    {
+                      "productId": productId,
+                      "productImage": productImage,
+                      "productName": productName,
+                      "productPrice": productPrice,
+                      "productOldPrice": productOldPrice,
+                      "productRate": productRate,
+                      "productDescription": productDescription,
+                      "productQuantity": 1,
+                      "productCategory": productCategory,
+                    },
+                  );
                   RoutingPage.goTonext(
                     context: context,
                     navigateTo: CartPage(),

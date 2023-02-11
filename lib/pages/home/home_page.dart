@@ -138,12 +138,15 @@ class _HomePageState extends State<HomePage> {
                         RoutingPage.goTonext(
                           context: context,
                           navigateTo: DetailsPage(
-                              productName: data["productName"],
-                              productImage: data["productImage"],
-                              productOldPrice: data["productOldPrice"],
-                              productPrice: data["productPrice"],
-                              productRate: data["productRate"],
-                              productDescription: data["productDescription"]),
+                            productCategory: data["productCategory"],
+                            productId: data["productId"],
+                            productName: data["productName"],
+                            productImage: data["productImage"],
+                            productOldPrice: data["productOldPrice"],
+                            productPrice: data["productPrice"],
+                            productRate: data["productRate"],
+                            productDescription: data["productDescription"],
+                          ),
                         );
                       },
                       name: data["productName"],
@@ -192,12 +195,15 @@ class _HomePageState extends State<HomePage> {
                         RoutingPage.goTonext(
                           context: context,
                           navigateTo: DetailsPage(
-                              productName: data["productName"],
-                              productImage: data["productImage"],
-                              productOldPrice: data["productOldPrice"],
-                              productPrice: data["productPrice"],
-                              productRate: data["productRate"],
-                              productDescription: data["productDescription"]),
+                            productCategory: data["productCategory"],
+                            productId: data["productId"],
+                            productName: data["productName"],
+                            productImage: data["productImage"],
+                            productOldPrice: data["productOldPrice"],
+                            productPrice: data["productPrice"],
+                            productRate: data["productRate"],
+                            productDescription: data["productDescription"],
+                          ),
                         );
                       },
                       name: data["productName"],

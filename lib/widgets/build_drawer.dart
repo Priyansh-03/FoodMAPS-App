@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:foodmaps_flutter/pages/Welcome/welcome_page.dart';
+import 'package:foodmaps_flutter/pages/cartPpage/CartPage.dart';
 import 'package:foodmaps_flutter/pages/home/home_page.dart';
 import 'package:foodmaps_flutter/pages/profile/profile_page.dart';
 import 'package:foodmaps_flutter/route/routing_page.dart';
@@ -41,7 +42,7 @@ class BuildDrawer extends StatelessWidget {
             onTap: () {
               RoutingPage.goTonext(
                 context: context,
-                navigateTo: HomePage(),
+                navigateTo: CartPage(),
               );
             },
             leading: Icon(
