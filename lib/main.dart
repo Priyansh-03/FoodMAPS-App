@@ -7,6 +7,8 @@ import 'package:foodmaps_flutter/pages/detailPage/details_page.dart';
 import 'package:foodmaps_flutter/pages/home/home_page.dart';
 import 'package:foodmaps_flutter/pages/login/component/login_auth_provider.dart';
 import 'package:foodmaps_flutter/pages/login/login_page.dart';
+import 'package:foodmaps_flutter/pages/provider/Favorite_provider.dart';
+import 'package:foodmaps_flutter/pages/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -61,6 +63,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => LoginAuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CartProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FavoriteProvider(),
         ),
       ],
       child: MaterialApp(

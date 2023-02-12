@@ -92,8 +92,9 @@ class _HomePageState extends State<HomePage> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => GridViewWidget(
-                              collection: streamSnapshort.data!.docs[index]
+                              subCollection: streamSnapshort.data!.docs[index]
                                   ["categoryName"],
+                              collection: "Categories",
                               id: streamSnapshort.data!.docs[index].id,
                             ),
                           ),
@@ -149,11 +150,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
-                      name: data["productName"],
-                      price: data["productPrice"],
-                      image: data["productImage"],
+                      productId: data["productId"],
+                      productCategory: data["productCategory"],
+                      productRate: data["productRate"],
+                      productOldPrice: data["productOldPrice"],
+                      productPrice: data["productPrice"],
+                      productImage: data["productImage"],
+                      productName: data["productName"],
                     );
-                    // return Categories(
                   },
                 );
               },
@@ -206,11 +210,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
-                      name: data["productName"],
-                      price: data["productPrice"],
-                      image: data["productImage"],
+                      productId: data["productId"],
+                      productCategory: data["productCategory"],
+                      productRate: data["productRate"],
+                      productOldPrice: data["productOldPrice"],
+                      productPrice: data["productPrice"],
+                      productImage: data["productImage"],
+                      productName: data["productName"],
                     );
-                    // return Categories(
                   },
                 );
               },

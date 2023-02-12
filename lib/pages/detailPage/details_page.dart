@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodmaps_flutter/pages/detailPage/components/second_part.dart';
 import 'package:foodmaps_flutter/pages/detailPage/components/top_part.dart';
 
+import '../../appColors/app_colors.dart';
+
 class DetailsPage extends StatelessWidget {
   final String productImage;
   final String productName;
@@ -30,6 +32,13 @@ class DetailsPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          "Product Description",
+          style: TextStyle(
+            color: AppColors.KblackColor,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(

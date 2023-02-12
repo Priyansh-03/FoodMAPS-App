@@ -5,7 +5,7 @@ import 'package:foodmaps_flutter/route/routing_page.dart';
 
 import '../../../appColors/app_colors.dart';
 import '../../../widgets/my_button.dart';
-import '../../cartPpage/CartPage.dart';
+import '../../cartPage/CartPage.dart';
 
 class SecondPart extends StatelessWidget {
   final String productName;

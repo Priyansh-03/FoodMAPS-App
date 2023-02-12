@@ -37,6 +37,15 @@ class _SingleCartItemState extends State<SingleCartItem> {
     });
   }
 
+  void DeleteProductFunction() {
+    FirebaseFirestore.instance
+        .collection("Cart")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("UserCart")
+        .doc(widget.productId)
+        .delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,21 +89,15 @@ class _SingleCartItemState extends State<SingleCartItem> {
                           fontSize: 18,
                         ),
                       ),
-                      /////
-
                       Text(
                         widget.productCategory,
                       ),
-
-                      //////
                       Text(
                         "${widget.productPrice * widget.productQuantity} ₹",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      ////////
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -107,17 +110,12 @@ class _SingleCartItemState extends State<SingleCartItem> {
                               });
                             },
                           ),
-                          ///////
-
                           Text(
                             widget.productQuantity.toString(),
                             style: TextStyle(
                               fontSize: 18,
                             ),
                           ),
-
-                          /////////
-
                           IncrementAndDecrement(
                             icon: Icons.remove,
                             onPressed: () {
@@ -139,7 +137,9 @@ class _SingleCartItemState extends State<SingleCartItem> {
             ],
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              DeleteProductFunction();
+            },
             icon: Icon(
               Icons.close,
             ),
