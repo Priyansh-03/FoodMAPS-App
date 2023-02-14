@@ -82,7 +82,7 @@ class _GridViewWidgetState extends State<GridViewWidget> {
                 ),
               ),
               result.isEmpty
-                  ? Text("Not Found")
+                  ? Text("Not Item")
                   : GridView.builder(
                       shrinkWrap: true,
                       itemCount: result.length,

@@ -14,9 +14,9 @@ class FavoriteProvider with ChangeNotifier {
     required productName,
   }) {
     FirebaseFirestore.instance
-        .collection("favorite")
+        .collection("Favorite")
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("userFavorite")
+        .collection("UserFavorite")
         .doc(productId)
         .set(
       {
@@ -34,9 +34,9 @@ class FavoriteProvider with ChangeNotifier {
 
   deleteFavorite({required String productId}) {
     FirebaseFirestore.instance
-        .collection("favorite")
+        .collection("Favorite")
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("userFavorite")
+        .collection("UserFavorite")
         .doc(productId)
         .delete();
     notifyListeners();

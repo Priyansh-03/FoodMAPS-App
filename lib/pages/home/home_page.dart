@@ -64,53 +64,6 @@ class _HomePageState extends State<HomePage> {
           ),
           ListTile(
             leading: Text(
-              "Categories",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ),
-          Container(
-            height: 100,
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("Categories")
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
-                if (!streamSnapshort.hasData) {
-                  return Center(child: const CircularProgressIndicator());
-                }
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: streamSnapshort.data!.docs.length,
-                  itemBuilder: (ctx, index) {
-                    return Categories(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => GridViewWidget(
-                              subCollection: streamSnapshort.data!.docs[index]
-                                  ["categoryName"],
-                              collection: "Categories",
-                              id: streamSnapshort.data!.docs[index].id,
-                            ),
-                          ),
-                        );
-                      },
-                      categoryName: streamSnapshort.data!.docs[index]
-                          ["categoryName"],
-                      image: streamSnapshort.data!.docs[index]["categoryImage"],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          ListTile(
-            leading: Text(
               "Products",
               style: TextStyle(
                 fontSize: 20,

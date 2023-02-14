@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:foodmaps_flutter/appColors/app_colors.dart';
+import 'package:foodmaps_flutter/pages/home/home_page.dart';
 import 'package:foodmaps_flutter/widgets/my_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/single_cart_item.dart';
 import '../provider/cart_provider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CheckOutPage extends StatefulWidget {
   const CheckOutPage({Key? key}) : super(key: key);
@@ -15,6 +17,79 @@ class CheckOutPage extends StatefulWidget {
 }
 
 class _CheckOutPageState extends State<CheckOutPage> {
+  late Razorpay _razorpay;
+  late double totalPrice;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
+
+  void openCheckout() async {
+    var options = {
+      'key': 'rzp_test_1DP5mmOlF5G5ag',
+      'amount': num.parse(totalPrice.toString()) * 100,
+      'name': userModel.fullName,
+      'description': 'Payment Gateway',
+      'prefill': {
+        'contact': '91',
+        'email': userModel.emailAddress,
+      },
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occured while opening PaymentGateway'),
+        ),
+      );
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+    // print("Payment Success");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Payment Successfull'),
+      ),
+    );
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Payment Error'),
+      ),
+    );
+    print(PaymentFailureResponse);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('External Wallet'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     CartProvider cartProvider = Provider.of<CartProvider>(context);
@@ -29,7 +104,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
     double value = subtotal - discountValue;
 
-    double totalPrice = value += shipping;
+    totalPrice = value += shipping;
 
     if (cartProvider.getCartList.isEmpty) {
       setState(() {
@@ -100,7 +175,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   cartProvider.getCartList.isEmpty
                       ? Text("")
                       : MyButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            openCheckout();
+                          },
                           text: "Place Order",
                         ),
                 ],

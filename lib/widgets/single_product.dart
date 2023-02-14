@@ -37,9 +37,9 @@ class _SingleProductState extends State<SingleProduct> {
     FavoriteProvider favoriteProvider = Provider.of<FavoriteProvider>(context);
 
     FirebaseFirestore.instance
-        .collection("favorite")
+        .collection("Favorite")
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("userFavorite")
+        .collection("UserFavorite")
         .doc(widget.productId)
         .get()
         .then(
