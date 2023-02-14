@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:foodmaps_flutter/pages/provider/Favorite_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../pages/home/home_page.dart';
+
 class SingleProduct extends StatefulWidget {
   final productId;
   final productCategory;
@@ -63,8 +65,8 @@ class _SingleProductState extends State<SingleProduct> {
           Container(
             margin: EdgeInsets.all(12.0),
             alignment: Alignment.topRight,
-            height: 200,
-            width: 150,
+            height: size!.height * 0.3,
+            width: size!.width / 2 - 20,
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
@@ -117,7 +119,7 @@ class _SingleProductState extends State<SingleProduct> {
                 width: 20,
               ),
               Text(
-                "\$${widget.productPrice}",
+                "${widget.productPrice} ₹",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),

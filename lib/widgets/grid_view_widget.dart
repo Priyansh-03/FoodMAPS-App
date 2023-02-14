@@ -43,86 +43,92 @@ class _GridViewWidgetState extends State<GridViewWidget> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection(widget.collection)
-            .doc(widget.id)
-            .collection(widget.subCollection)
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshort) {
-          if (!snapshort.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          var varData = searchFunction(query, snapshort.data!.docs);
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Material(
-                  elevation: 7,
-                  shadowColor: Colors.grey[300],
-                  child: TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        query = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      fillColor: AppColors.KwhiteColor,
-                      hintText: "Search Your Product",
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Material(
+              elevation: 7,
+              shadowColor: Colors.grey[300],
+              child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    query = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  fillColor: AppColors.KwhiteColor,
+                  hintText: "Search Your Product",
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
-              result.isEmpty
-                  ? Text("Not Item")
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      itemCount: result.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 5.0,
-                        mainAxisSpacing: 5.0,
-                        childAspectRatio: 0.6,
-                      ),
-                      itemBuilder: (ctx, index) {
-                        var data = varData[index];
-                        return SingleProduct(
-                          onTap: () {
-                            RoutingPage.goTonext(
-                              context: context,
-                              navigateTo: DetailsPage(
-                                productCategory: data["productCategory"],
-                                productId: data["productId"],
-                                productImage: data["productImage"],
-                                productName: data["productName"],
-                                productOldPrice: data["productOldPrice"],
-                                productPrice: data["productPrice"],
-                                productRate: data["productRate"],
-                                productDescription: data["productDescription"],
-                              ),
+            ),
+          ),
+          StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection(widget.collection)
+                .doc(widget.id)
+                .collection(widget.subCollection)
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshort) {
+              if (!snapshort.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              var varData = searchFunction(query, snapshort.data!.docs);
+              return Column(
+                children: [
+                  result.isEmpty
+                      ? Center(child: Text("No Item found"))
+                      : GridView.builder(
+                          shrinkWrap: true,
+                          itemCount: result.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 5.0,
+                            mainAxisSpacing: 5.0,
+                            childAspectRatio: 0.6,
+                          ),
+                          itemBuilder: (ctx, index) {
+                            var data = varData[index];
+                            return SingleProduct(
+                              onTap: () {
+                                RoutingPage.goTonext(
+                                  context: context,
+                                  navigateTo: DetailsPage(
+                                    productCategory: data["productCategory"],
+                                    productId: data["productId"],
+                                    productImage: data["productImage"],
+                                    productName: data["productName"],
+                                    productOldPrice: data["productOldPrice"],
+                                    productPrice: data["productPrice"],
+                                    productRate: data["productRate"],
+                                    productDescription:
+                                        data["productDescription"],
+                                  ),
+                                );
+                              },
+                              productId: data["productId"],
+                              productCategory: data["productCategory"],
+                              productRate: data["productRate"],
+                              productOldPrice: data["productOldPrice"],
+                              productPrice: data["productPrice"],
+                              productImage: data["productImage"],
+                              productName: data["productName"],
                             );
                           },
-                          productId: data["productId"],
-                          productCategory: data["productCategory"],
-                          productRate: data["productRate"],
-                          productOldPrice: data["productOldPrice"],
-                          productPrice: data["productPrice"],
-                          productImage: data["productImage"],
-                          productName: data["productName"],
-                        );
-                      },
-                    ),
-            ],
-          );
-        },
+                        ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }

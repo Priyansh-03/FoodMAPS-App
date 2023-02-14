@@ -8,8 +8,11 @@ import 'package:foodmaps_flutter/route/routing_page.dart';
 import 'package:foodmaps_flutter/widgets/build_drawer.dart';
 import 'package:foodmaps_flutter/widgets/grid_view_widget.dart';
 import 'package:foodmaps_flutter/widgets/single_product.dart';
+import 'package:get/get.dart';
 
 late UserModel userModel;
+
+Size? size;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,6 +22,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String query = "";
+  var result;
+  searchFunction(query, searchList) {
+    result = searchList.where((element) {
+      return element["productName"].toUpperCase().contains(query) ||
+          element["productName"].toLowerCase().contains(query) ||
+          element["productName"].toUpperCase().contains(query) &&
+              element["productName"].toLowerCase().contains(query);
+    }).toList();
+    return result;
+  }
+
   Future getCurrentUserDataFunction() async {
     await FirebaseFirestore.instance
         .collection("Users")
@@ -33,8 +48,111 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget buildCategory() {
+    return Column(
+      children: [
+        ListTile(
+          leading: Text(
+            "Categories",
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+        Container(
+          height: size!.height * 0.1 + 20,
+          child: StreamBuilder(
+            stream:
+                FirebaseFirestore.instance.collection("Categories").snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
+              if (!streamSnapshort.hasData) {
+                return Center(child: const CircularProgressIndicator());
+              }
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                itemCount: streamSnapshort.data!.docs.length,
+                itemBuilder: (ctx, index) {
+                  return Categories(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => GridViewWidget(
+                            subCollection: streamSnapshort.data!.docs[index]
+                                ["categoryName"],
+                            collection: "Categories",
+                            id: streamSnapshort.data!.docs[index].id,
+                          ),
+                        ),
+                      );
+                    },
+                    categoryName: streamSnapshort.data!.docs[index]
+                        ["categoryName"],
+                    image: streamSnapshort.data!.docs[index]["categoryImage"],
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildProduct(
+      {required Stream<QuerySnapshot<Map<String, dynamic>>>? stream}) {
+    return Container(
+      height: size!.height / 3 + 40,
+      child: StreamBuilder(
+        stream: stream,
+        builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
+          if (!streamSnapshort.hasData) {
+            return Center(child: const CircularProgressIndicator());
+          }
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: BouncingScrollPhysics(),
+            itemCount: streamSnapshort.data!.docs.length,
+            itemBuilder: (ctx, index) {
+              var varData = searchFunction(query, streamSnapshort.data!.docs);
+              var data = varData[index];
+              // var data = streamSnapshort.data!.docs[index];
+              return SingleProduct(
+                onTap: () {
+                  RoutingPage.goTonext(
+                    context: context,
+                    navigateTo: DetailsPage(
+                      productCategory: data["productCategory"],
+                      productId: data["productId"],
+                      productImage: data["productImage"],
+                      productName: data["productName"],
+                      productOldPrice: data["productOldPrice"],
+                      productPrice: data["productPrice"],
+                      productRate: data["productRate"],
+                      productDescription: data["productDescription"],
+                    ),
+                  );
+                },
+                productId: data["productId"],
+                productCategory: data["productCategory"],
+                productRate: data["productRate"],
+                productOldPrice: data["productOldPrice"],
+                productPrice: data["productPrice"],
+                productImage: data["productImage"],
+                productName: data["productName"],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     getCurrentUserDataFunction();
     return Scaffold(
       drawer: BuildDrawer(),
@@ -50,10 +168,15 @@ class _HomePageState extends State<HomePage> {
               elevation: 7,
               shadowColor: Colors.grey[300],
               child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    query = value;
+                  });
+                },
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.search),
                   fillColor: AppColors.KwhiteColor,
-                  hintText: "Search Your Item",
+                  hintText: "Search Your Product",
                   filled: true,
                   border: OutlineInputBorder(
                     borderSide: BorderSide.none,
@@ -62,125 +185,301 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          ListTile(
-            leading: Text(
-              "Products",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ),
-          Container(
-            height: 280,
-            child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection("Products").snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
-                if (!streamSnapshort.hasData) {
-                  return Center(child: const CircularProgressIndicator());
-                }
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: streamSnapshort.data!.docs.length,
-                  itemBuilder: (ctx, index) {
-                    var data = streamSnapshort.data!.docs[index];
-                    return SingleProduct(
-                      onTap: () {
-                        RoutingPage.goTonext(
-                          context: context,
-                          navigateTo: DetailsPage(
-                            productCategory: data["productCategory"],
-                            productId: data["productId"],
-                            productName: data["productName"],
-                            productImage: data["productImage"],
-                            productOldPrice: data["productOldPrice"],
-                            productPrice: data["productPrice"],
-                            productRate: data["productRate"],
-                            productDescription: data["productDescription"],
-                          ),
-                        );
-                      },
-                      productId: data["productId"],
-                      productCategory: data["productCategory"],
-                      productRate: data["productRate"],
-                      productOldPrice: data["productOldPrice"],
-                      productPrice: data["productPrice"],
-                      productImage: data["productImage"],
-                      productName: data["productName"],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          ListTile(
-            leading: Text(
-              "Best Sell",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ),
-          Container(
-            height: 280,
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("Products")
-                  .where("productRate", isGreaterThan: 3)
-                  .orderBy(
-                    "productRate",
-                    descending: true,
-                  )
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
-                if (!streamSnapshort.hasData) {
-                  return Center(child: const CircularProgressIndicator());
-                }
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: streamSnapshort.data!.docs.length,
-                  itemBuilder: (ctx, index) {
-                    var data = streamSnapshort.data!.docs[index];
-                    return SingleProduct(
-                      onTap: () {
-                        RoutingPage.goTonext(
-                          context: context,
-                          navigateTo: DetailsPage(
-                            productCategory: data["productCategory"],
-                            productId: data["productId"],
-                            productName: data["productName"],
-                            productImage: data["productImage"],
-                            productOldPrice: data["productOldPrice"],
-                            productPrice: data["productPrice"],
-                            productRate: data["productRate"],
-                            productDescription: data["productDescription"],
-                          ),
-                        );
-                      },
-                      productId: data["productId"],
-                      productCategory: data["productCategory"],
-                      productRate: data["productRate"],
-                      productOldPrice: data["productOldPrice"],
-                      productPrice: data["productPrice"],
-                      productImage: data["productImage"],
-                      productName: data["productName"],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+          query == ""
+              ? Column(
+                  children: [
+                    buildCategory(),
+                    ListTile(
+                      leading: Text(
+                        "Products",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    buildProduct(
+                      stream: FirebaseFirestore.instance
+                          .collection("Products")
+                          .snapshots(),
+                    ),
+                    ListTile(
+                      leading: Text(
+                        "Best Sell",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    buildProduct(
+                      stream: FirebaseFirestore.instance
+                          .collection("Products")
+                          .where("productRate", isGreaterThan: 3)
+                          .orderBy(
+                            "productRate",
+                            descending: true,
+                          )
+                          .snapshots(),
+                    ),
+                  ],
+                )
+              : Container(
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("Products")
+                        .snapshots(),
+                    builder: (context,
+                        AsyncSnapshot<QuerySnapshot> streamSnapshort) {
+                      if (!streamSnapshort.hasData) {
+                        return Center(child: const CircularProgressIndicator());
+                      }
+                      var varData =
+                          searchFunction(query, streamSnapshort.data!.docs);
+                      return result.isEmpty
+                          ? Center(child: Text("Not Found"))
+                          : GridView.builder(
+                              shrinkWrap: true,
+                              itemCount: result.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 5.0,
+                                mainAxisSpacing: 5.0,
+                                childAspectRatio: 0.6,
+                              ),
+                              itemBuilder: (ctx, index) {
+                                var data = varData[index];
+                                return SingleProduct(
+                                  onTap: () {
+                                    RoutingPage.goTonext(
+                                      context: context,
+                                      navigateTo: DetailsPage(
+                                        productCategory:
+                                            data["productCategory"],
+                                        productId: data["productId"],
+                                        productImage: data["productImage"],
+                                        productName: data["productName"],
+                                        productOldPrice:
+                                            data["productOldPrice"],
+                                        productPrice: data["productPrice"],
+                                        productRate: data["productRate"],
+                                        productDescription:
+                                            data["productDescription"],
+                                      ),
+                                    );
+                                  },
+                                  productId: data["productId"],
+                                  productCategory: data["productCategory"],
+                                  productRate: data["productRate"],
+                                  productOldPrice: data["productOldPrice"],
+                                  productPrice: data["productPrice"],
+                                  productImage: data["productImage"],
+                                  productName: data["productName"],
+                                );
+                              },
+                            );
+                    },
+                  ),
+                ),
         ],
       ),
     );
   }
 }
+
+//   Widget buildProduct(
+//       {required Stream<QuerySnapshot<Map<String, dynamic>>>? stream}) {
+//     return Container(
+//       height: size!.height / 3 + 40,
+//       child: StreamBuilder(
+//         stream: FirebaseFirestore.instance.collection("Products").snapshots(),
+//         builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshort) {
+//           if (!streamSnapshort.hasData) {
+//             return Center(child: const CircularProgressIndicator());
+//           }
+//           return ListView.builder(
+//             scrollDirection: Axis.horizontal,
+//             physics: BouncingScrollPhysics(),
+//             itemCount: streamSnapshort.data!.docs.length,
+//             itemBuilder: (ctx, index) {
+//               var vardata = searchFunction(query, streamSnapshort.data!.docs);
+
+//               var data = vardata[index];
+
+//               // var data = streamSnapshort.data!.docs[index];
+//               return SingleProduct(
+//                 onTap: () {
+//                   RoutingPage.goTonext(
+//                     context: context,
+//                     navigateTo: DetailsPage(
+//                       productCategory: data["productCategory"],
+//                       productId: data["productId"],
+//                       productName: data["productName"],
+//                       productImage: data["productImage"],
+//                       productOldPrice: data["productOldPrice"],
+//                       productPrice: data["productPrice"],
+//                       productRate: data["productRate"],
+//                       productDescription: data["productDescription"],
+//                     ),
+//                   );
+//                 },
+//                 productId: data["productId"],
+//                 productCategory: data["productCategory"],
+//                 productRate: data["productRate"],
+//                 productOldPrice: data["productOldPrice"],
+//                 productPrice: data["productPrice"],
+//                 productImage: data["productImage"],
+//                 productName: data["productName"],
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     size = MediaQuery.of(context).size;
+//     getCurrentUserDataFunction();
+//     return Scaffold(
+//       drawer: BuildDrawer(),
+//       appBar: AppBar(
+//         elevation: 0,
+//         backgroundColor: Colors.transparent,
+//       ),
+//       body: ListView(
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Material(
+//               elevation: 7,
+//               shadowColor: Colors.grey[300],
+//               child: TextFormField(
+//                 onChanged: (Value) {
+//                   setState(() {
+//                     query = Value;
+//                   });
+//                 },
+//                 decoration: InputDecoration(
+//                   prefixIcon: Icon(Icons.search),
+//                   fillColor: AppColors.KwhiteColor,
+//                   hintText: "Search Your Item",
+//                   filled: true,
+//                   border: OutlineInputBorder(
+//                     borderSide: BorderSide.none,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//           query == ""
+//               ? Column(
+//                   children: [
+//                     buildCategory(),
+//                     ListTile(
+//                       leading: Text(
+//                         "Products",
+//                         style: TextStyle(
+//                           fontSize: 20,
+//                           // color: Colors.grey[600],
+//                           fontWeight: FontWeight.normal,
+//                         ),
+//                       ),
+//                     ),
+//                     buildProduct(
+//                       stream: FirebaseFirestore.instance
+//                           .collection("Products")
+//                           .snapshots(),
+//                     ),
+//                     ListTile(
+//                       leading: Text(
+//                         "Best Sell",
+//                         style: TextStyle(
+//                           fontSize: 20,
+//                           color: Colors.grey[600],
+//                           fontWeight: FontWeight.normal,
+//                         ),
+//                       ),
+//                     ),
+//                     buildProduct(
+//                       stream: FirebaseFirestore.instance
+//                           .collection("Products")
+//                           .where("productRate", isGreaterThan: 4)
+//                           .orderBy(
+//                             "productRate",
+//                             descending: true,
+//                           )
+//                           .snapshots(),
+//                     ),
+//                   ],
+//                 )
+//               : Container(
+//                   // height: 300,
+//                   child: StreamBuilder(
+//                     stream: FirebaseFirestore.instance
+//                         .collection("Products")
+//                         .snapshots(),
+//                     builder: (context,
+//                         AsyncSnapshot<QuerySnapshot> streamSnapshort) {
+//                       if (!streamSnapshort.hasData) {
+//                         return Center(child: const CircularProgressIndicator());
+//                       }
+//                       var vardata =
+//                           searchFunction(query, streamSnapshort.data!.docs);
+
+//                       return result.isEmpty
+//                           ? Center(child: Text("No Item Found"))
+//                           : GridView.builder(
+//                               shrinkWrap: true,
+//                               itemCount: result.length,
+//                               gridDelegate:
+//                                   SliverGridDelegateWithFixedCrossAxisCount(
+//                                 crossAxisCount: 2,
+//                                 crossAxisSpacing: 5.0,
+//                                 mainAxisSpacing: 5.0,
+//                                 childAspectRatio: 0.6,
+//                               ),
+//                               itemBuilder: (ctx, index) {
+//                                 var data = vardata[index];
+//                                 return SingleProduct(
+//                                   onTap: () {
+//                                     RoutingPage.goTonext(
+//                                       context: context,
+//                                       navigateTo: DetailsPage(
+//                                         productCategory:
+//                                             data["productCategory"],
+//                                         productId: data["productId"],
+//                                         productName: data["productName"],
+//                                         productImage: data["productImage"],
+//                                         productOldPrice:
+//                                             data["productOldPrice"],
+//                                         productPrice: data["productPrice"],
+//                                         productRate: data["productRate"],
+//                                         productDescription:
+//                                             data["productDescription"],
+//                                       ),
+//                                     );
+//                                   },
+//                                   productId: data["productId"],
+//                                   productCategory: data["productCategory"],
+//                                   productRate: data["productRate"],
+//                                   productOldPrice: data["productOldPrice"],
+//                                   productPrice: data["productPrice"],
+//                                   productImage: data["productImage"],
+//                                   productName: data["productName"],
+//                                 );
+//                               },
+//                             );
+//                     },
+//                   ),
+//                 ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class Categories extends StatelessWidget {
   final String image;
@@ -199,8 +498,8 @@ class Categories extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.all(12.0),
-        height: 100,
-        width: 150,
+        // height: size!.height * 0.1,
+        width: size!.width / 2 - 20,
         decoration: BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.cover,

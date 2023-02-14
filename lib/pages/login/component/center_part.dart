@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodmaps_flutter/pages/forgetPassword/forget_password.dart';
+import 'package:foodmaps_flutter/route/routing_page.dart';
 
 class CenterPart extends StatelessWidget {
   final bool obscureText;
@@ -30,6 +32,21 @@ class CenterPart extends StatelessWidget {
           obscureText: obscureText,
           controller: password,
           decoration: InputDecoration(
+            counter: GestureDetector(
+              onTap: () {
+                RoutingPage.goTonext(
+                  context: context,
+                  navigateTo: ForgetPassword(),
+                );
+              },
+              child: Text(
+                "Forget Password?",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             hintText: "Password",
             suffixIcon: IconButton(
               onPressed: onPressed,
